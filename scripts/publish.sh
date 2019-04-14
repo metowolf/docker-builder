@@ -22,7 +22,7 @@ fi
 
 image_build="$1" && shift
 image_target="$1" && shift
-prefix_count=${1:-"1"}
+prefix_count=${1:-"0"}
 
 target_name=`echo "$image_target" | cut -d: -f1`
 target_version=`echo "$image_target" | cut -d: -f2`
@@ -33,9 +33,15 @@ versions=()
 if [[ "$target_version" =~ -dev$ ]]; then
   is_dev="true"
   target_version=`echo $target_version | sed 's/-dev$//'`
-  versions+=("dev")
-else
-  versions+=("latest")
+fi
+
+if [[ "$prefix_count" = "0" ]]; then
+  if [ ! -z $is_dev ]; then
+    versions+=("dev")
+  else
+    versions+=("latest")
+  fi
+  prefix_count="1"
 fi
 
 for (( i=$((${target_version_count}+1)); i>=${prefix_count}; i-- )); do
